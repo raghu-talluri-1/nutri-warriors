@@ -531,7 +531,7 @@ with tab3:
 
         with lc1:
             st.markdown("**Foods scanned per kid**")
-            counts = df["Source_Kid"].value_counts().reset_index()
+            counts = df["Source_Kid"].value_counts().reset_index() if "Source_Kid" in df.columns else pd.DataFrame({"Source_Kid":[],"count":[]})
             counts.columns = ["Kid", "Foods Scanned"]
             st.dataframe(counts, use_container_width=True, hide_index=True)
 
@@ -549,7 +549,8 @@ with tab3:
         with lc2:
             st.markdown("**Most sodium (top 5 — worth knowing!)**")
             try:
-                sod = df[["Food_Name","Source_Kid","Sodium_mg"]].copy()
+                cols = [c for c in ["Food_Name","Source_Kid","Sodium_mg"] if c in df.columns]
+                sod = df[cols].copy()
                 sod["Sodium_mg"] = pd.to_numeric(sod["Sodium_mg"], errors="coerce")
                 sod = sod.dropna().sort_values("Sodium_mg", ascending=False).head(5)
                 st.dataframe(sod.reset_index(drop=True), use_container_width=True, hide_index=True)
@@ -558,7 +559,8 @@ with tab3:
 
             st.markdown("**Most added sugar (top 5)**")
             try:
-                sug = df[["Food_Name","Source_Kid","Sugar_Added_g"]].copy()
+                cols = [c for c in ["Food_Name","Source_Kid","Sugar_Added_g"] if c in df.columns]
+                sug = df[cols].copy()
                 sug["Sugar_Added_g"] = pd.to_numeric(sug["Sugar_Added_g"], errors="coerce")
                 sug = sug.dropna().sort_values("Sugar_Added_g", ascending=False).head(5)
                 st.dataframe(sug.reset_index(drop=True), use_container_width=True, hide_index=True)
