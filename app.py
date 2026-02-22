@@ -471,11 +471,15 @@ with tab2:
             cat_opts = sorted([x for x in df["Category"].unique() if x != ""])
             cat_filter = st.multiselect("Filter by category", cat_opts, default=cat_opts)
 
-        filtered = df[
-            df["Source_Kid"].isin(kid_filter) &
-            (df["NOVA_Class"].isin(nova_filter) if nova_filter else True) &
-            (df["Category"].isin(cat_filter) if cat_filter else True)
-        ]
+        # Safely filter — handle missing columns gracefully
+        mask = pd.Series([True] * len(df))
+        if "Source_Kid" in df.columns:
+            mask &= df["Source_Kid"].isin(kid_filter)
+        if "NOVA_Class" in df.columns and nova_filter:
+            mask &= df["NOVA_Class"].isin(nova_filter)
+        if "Category" in df.columns and cat_filter:
+            mask &= df["Category"].isin(cat_filter)
+        filtered = df[mask]
 
         # Stats row
         s1, s2, s3, s4 = st.columns(4)
